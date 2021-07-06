@@ -1,0 +1,23 @@
+@import url(https://fonts.googleapis.com/css?family=Nunito);
+.main-page {
+  -webkit-animation: fadein 2s;
+          animation: fadein 2s;
+}
+
+@-webkit-keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
