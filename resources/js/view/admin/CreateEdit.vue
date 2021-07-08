@@ -40,12 +40,14 @@
                                                   label="ФИО"
                                                   prepend-icon="mdi-account"
                                                   type="text"
+                                                  :error-messages="errors.name"
 
                                     ></v-text-field>
                                     <v-text-field v-model="worker.post"
                                                   label="Должность"
                                                   prepend-icon="mdi-account"
                                                   type="text"
+                                                  :error-messages="errors.post"
 
                                     ></v-text-field>
 
@@ -60,11 +62,12 @@
                                         <template v-slot:activator="{ on, attrs }">
                                             <v-text-field
                                                 v-model="worker.device_date"
-                                                label="Birthday date"
+                                                label="Дата устройства"
                                                 prepend-icon="mdi-calendar"
                                                 readonly
                                                 v-bind="attrs"
                                                 v-on="on"
+                                                :error-messages="errors.device_date"
                                             ></v-text-field>
                                         </template>
                                         <v-date-picker
@@ -81,6 +84,7 @@
                                                   label="Зарплата"
                                                   prepend-icon="mdi-account"
                                                   type="text"
+                                                  :error-messages="errors.salary"
 
                                     ></v-text-field>
                                     <v-text-field
@@ -307,11 +311,32 @@ export default {
                     this.worker.device_date=''
                     this.worker.salary=''
                     this.worker.parent_id=''
-
+                    this.errors={}
                     this.$router.push({name:'Workers'})
                 })
             .catch(err=>{   this.errors=err.response.data.errors
-            console.log(this.errors)
+
+                if(this.errors.name)
+                {
+                    this.errors.name='Ведите ФИО'
+                }
+
+                if (this.errors.post)
+                {
+                    this.errors.post='Введите должность сотрудника'
+                }
+
+                if(this.errors.salary)
+                {
+                    this.errors.salary='Введите зарплату сотрудника (дробную часть через точку)'
+                }
+                    if(this.errors.device_date)
+                    {
+                        this.errors.device_date='Выберите дату устройства'
+
+                    }
+                console.log(this.errors)
+
             })
 
         },
