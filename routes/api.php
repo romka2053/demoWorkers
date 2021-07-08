@@ -17,17 +17,21 @@ use App\Http\Controllers\API\WorkerController;
 
 Route::post("register/", [AuthController::class,'register']);
 Route::post("login/", [AuthController::class,'login']);
-Route::post('upload_file/',[WorkerController::class,'image']);
 
 Route::get("tree/", [WorkerController::class,'tree']);
-Route::group(['middleware'=>['auth:sanctum']],function (){
 
+
+
+Route::group(['middleware'=>['auth:sanctum']],function (){
+    Route::post('upload_file/',[WorkerController::class,'image']);
+    Route::get("workers/", [WorkerController::class,'index']);
+    Route::put("workers/parent", [WorkerController::class,'Parent']);
+    Route::get("treedel/", [WorkerController::class,'treeDel']);
     Route::post("logout/", [AuthController::class,'logout']);
     Route::post("workers/", [WorkerController::class,'store']);
     Route::put("workers/{id}", [WorkerController::class,'update']);
     Route::get("workers/{id}", [WorkerController::class,'show']);
     Route::delete("workers/{id}", [WorkerController::class,'destroy']);
-    Route::get("workers/", [WorkerController::class,'index']);
 
 
     Route::get('/user', function (Request $request) {

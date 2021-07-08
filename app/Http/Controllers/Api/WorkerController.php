@@ -9,9 +9,10 @@ use mysql_xdevapi\Exception;
 class WorkerController extends Controller
 {
     public function index(Request $request)
-    { /**
+    {
         $search=$request->input('s');
         $sort=$request->input('h');
+        $pagecount=$request->p;
         if($search!=null || $sort!=null)
         {
             if($search!=null) {
@@ -25,7 +26,7 @@ class WorkerController extends Controller
             }
             if($sort==null)
             {
-                $workers=$workers->paginate(15);
+                $workers=$workers->paginate($pagecount);
 
             }else {
 
@@ -33,11 +34,11 @@ class WorkerController extends Controller
 
                     $par="DESC";
                     $name=substr($sort,1);
-                    $workers = $workers->orderby($name, $par)->paginate(15);
+                    $workers = $workers->orderby($name, $par)->paginate($pagecount);
 
                 }else{
                     $par="asc";
-                    $workers = $workers->orderby($sort, $par)->paginate(15);
+                    $workers = $workers->orderby($sort, $par)->paginate($pagecount);
 
                 }
             }
@@ -47,12 +48,11 @@ class WorkerController extends Controller
 
         }
         else {
-            return worker::paginate(15);
+            return worker::paginate($pagecount);
         }
 
-     */
-        $workers=Worker::all();
-        return $workers;
+
+
     }
 
     /**
@@ -62,9 +62,20 @@ class WorkerController extends Controller
      * @return \Illuminate\Http\Response
      */
 
+    public function treeDel(Request $request)
+    {
+        $parent_id=$request->id;
+        $delete_id=$request->delete_id;
+        $chief = Worker::where([['parent_id',$parent_id],['id','<>',$delete_id]])
+            ->with('children')
+            ->get();
+        return $chief;
+    }
+
     public function tree(Request $request)
     {
         $parent_id=$request->id;
+        $delete_id=$request->delete_id;
         $chief = Worker::where('parent_id',$parent_id)
             ->with('children')
             ->get();
@@ -73,18 +84,46 @@ class WorkerController extends Controller
 
     public function store(Request $request)
     {
-        $addworker=  new worker([
-            'name'=>$request->
-            get('name'),
-            'post'=>$request->
-            get('post'),
-            'device_date'=>$request->
-            get('device_date'),
-            'salary'=>$request->
-            get('salary'),
-            'parent_id'=>$request->
-            get('parent_id'),
 
+        $request->validate([
+            'name' => ['required', 'string', 'max:100'],
+            'post' => ['required', 'string', 'max:40'],
+            'device_date' => ['required'],
+            'salary' => ['required','numeric'],
+            'parent_id' => ['integer'],
+
+        ]);
+        if($request->fupload)
+        {
+            $file=$request->fupload;
+
+
+            $filename=$file->getClientOriginalName();
+            $filename=time().random_int(1,10000).$filename;
+            //$mime=$file->getClientMimeType();
+            // $size=$file->getSize();
+
+            try{
+                $file->move('images',$filename);
+
+
+            }catch(Exception $e){
+
+                $result['success']=$request->fupload;
+            }
+
+        }else{
+            $filename=null;
+
+        }
+
+        $addworker=  new worker([
+            'name'=>$request->name,
+            'post'=>$request->post,
+            'device_date'=>$request->device_date,
+            'salary'=>$request->salary,
+            'parent_id'=>$request->parent_id,
+            'urlImage'=>$filename
         ]);
         $addworker->save();
     }
@@ -123,6 +162,14 @@ class WorkerController extends Controller
     {
         worker::find($id)->delete();
     }
+    public function Parent(Request $request){
+        $deleteid=$request->deleteid;
+        $parentid=$request->parentid;
+       Worker::where('parent_id',$deleteid)->update(['parent_id' => $parentid]);
+
+
+
+    }
 
     public function image(Request $request)
     {
@@ -136,12 +183,13 @@ class WorkerController extends Controller
 
             $ext=$file->getClientOriginalExtension();
             $filename=$file->getClientOriginalName();
+            $rand='$rand'.'$rand';
+            $filename=time().random_int(1,10000).$filename;
             //$mime=$file->getClientMimeType();
            // $size=$file->getSize();
 
             try{
                 $file->move('images',$filename);
-
                 $editWorker=worker::find($id);
                 $editWorker->urlImage=$filename;
                 $editWorker->save();

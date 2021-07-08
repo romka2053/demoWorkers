@@ -1,7 +1,9 @@
 <template>
     <div>
+
         <v-text-field
-            @keypress.enter="getWorker"
+
+            @keypress.enter="getWorker(findId)"
             v-model="findId"
                       label="Введите id сотрудника"
                       prepend-icon="mdi-account"
@@ -9,19 +11,28 @@
 
         ></v-text-field>
         <div v-if="!loading">
-                <v-card-title >{{worker.name}}</v-card-title>
+
 
                 <v-card
 
 
-                    class="mx-auto my-12"
+                    class="mx-auto "
 
                     min-height="400"
                 >
-                                <img :src="'/images/'+form.imageUrl" class="preview-image">
+                    <v-toolbar
+                        color="primary"
+                        dark
+                        flat
+                    >
+                        <v-toolbar-title>{{worker.name}}</v-toolbar-title>
+
+
+                    </v-toolbar>
+
                     <v-card-text>
 
-
+                        <img :src="'/images/'+form.imageUrl" class="preview-image">
                         <h3 >
                           Должность: {{worker.post}}
                         </h3>
@@ -59,7 +70,7 @@ data(){
         loading:true,
         errored:false,
         form:{
-     imageUrl:null,
+                imageUrl:null,
             },
  worker:{},
     }
@@ -67,12 +78,20 @@ data(){
 
     created() {
         axios.defaults.headers.common['Authorization']=`Bearer ${this.token}`;
-
+        this.goFoorm();
 
     },
     methods:{
-        getWorker() {
-            if (this.findId) {
+        goFoorm(){
+           if(this.$route.params.id  )
+           {
+
+               this.getWorker(this.$route.params.id)
+           }
+
+        },
+        getWorker(id) {
+            if (id) {
                 axios
                     .get(`/api/workers/${this.findId}`)
                     .then(response => {

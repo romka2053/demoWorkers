@@ -1,10 +1,10 @@
 <template>
     <v-app>
-        <v-main >
+
             <v-container>
                 <v-card>
 
-                    <v-card-title>Древо</v-card-title>
+                    <v-card-title>Древо сотрудников</v-card-title>
                     <v-card-text>
                         <v-treeview
                             activatable
@@ -19,7 +19,7 @@
                 </v-card>
             </v-container>
 
-        </v-main>
+
     </v-app>
 
 </template>
@@ -71,10 +71,14 @@ export default {
                     this.workers=response.data
                     for(var i=0;i<response.data.length;i++)
                     {
-                        if(this.workers[i].children)
+                        if(this.workers[i].children!='')
                         {
                             this.workers[i].children=[];
 
+                        }else
+                        {
+
+                            delete this.workers[i].children
                         }
 
                     }
