@@ -389,7 +389,7 @@ export default {
                         this.errors={}
                         this.$router.push({name:'Workers'})
                     })
-                    .catch(err=>{ err.response.data.errors
+                    .catch(err=>{ this.errors=err.response.data.errors
 
                         if(this.errors.name)
                         {
@@ -411,7 +411,7 @@ export default {
 
                         }
 
-                        console.log(this.errors)
+
                     })})
                 .catch(err=>{this.errors=err.response.data.errors})
 
