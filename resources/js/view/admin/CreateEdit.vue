@@ -14,9 +14,9 @@
 
                     <v-row>
                         <v-col cols="3">
-                                <div v-if="formData.uploadFileData">
-                                    <img :src="formData.uploadFileData" class="preview-image">
-                                    <v-btn @click="uploadImage" >Загрузить</v-btn>
+                                <div v-if="worker.urlImage">
+                                    <img :src="worker.urlImage" class="preview-image">
+
                                 </div>
                                 <div v-else>
                                     <img src="/images/not_avatar.jpg" class="preview-image">
@@ -34,6 +34,7 @@
                                         placeholder="Pick an avatar"
                                         prepend-icon="mdi-camera"
                                         label="Avatar"
+                                        :error-messages="errors.fupload"
                                     ></v-file-input>
 
                                     <v-text-field v-model="worker.name"
@@ -169,19 +170,19 @@ export default {
 
 
 
-
     data(){
         return{
             token:localStorage.getItem('token'),
             dialogTree: false,
             selected:[],
             worker:{
-                id:'',
-                name:'',
-                post:'',
-                device_date:'',
-                salary:'',
-                parent_id:'',
+                id:this.$route.params.id,
+                name:this.$route.params.name,
+                post:this.$route.params.post,
+                device_date:this.$route.params.device_date,
+                salary:this.$route.params.salary,
+                parent_id:this.$route.params.parent_id,
+                urlImage:this.$route.params.urlImage
             },
             workers: [],
             menu: false,
@@ -200,13 +201,26 @@ export default {
     },
     created() {
 
+
         axios.defaults.headers.common['Authorization']=`Bearer ${this.token}`;
 
     },
     watch: {
         menu (val) {
             val && setTimeout(() => (this.activePicker = 'YEAR'))
+
         },
+        $route(to,from)
+        {
+
+            this.worker.id = this.$route.params.id
+            this.worker.name = this.$route.params.name
+            this.worker.post = this.$route.params.post
+            this.worker.device_date = this.$route.params.device_date
+            this.worker.salary = this.$route.params.salary
+            this.worker.urlImage = this.$route.params.urlImage
+            this.worker.parent_id = this.$route.params.parent_id
+        }
     },
     methods:{
         goParent(item){
@@ -259,7 +273,7 @@ export default {
         getWorkers(){
 
             axios
-                .get('/api/tree/')
+                .get('/api/treedel/',{params:{delete_id:this.worker.id}})
                 .then(response =>{
                     this.workers=response.data
                     for(var i=0;i<response.data.length;i++)
@@ -288,6 +302,8 @@ export default {
             this.$refs.menu.save(date)
         },
         createWorker(){
+            if(!this.$route.params.id){
+                //добавление сотрудника
 
             let data=new FormData()
             if(this.formData.file) {
@@ -335,9 +351,74 @@ export default {
                         this.errors.device_date='Выберите дату устройства'
 
                     }
-                console.log(this.errors)
+                if(this.errors.fupload)
+                {
+                    this.errors.fupload='Допускается загрузка только в формате изображения'
 
+                }
             })
+
+            }
+            else{
+                //Редактирование сотрудника
+
+                let data=new FormData()
+                if(this.formData.file) {
+                    data.append('fupload', this.formData.file)
+                    data.append('id', this.worker.id)
+                }
+            axios
+                axios
+                    .post('/api/upload_file',data)
+                .then(response=>{axios
+                    .put(`/api/workers/${this.worker.id}`,{
+                        name:this.worker.name,
+                        post:this.worker.post,
+                        device_date:this.worker.device_date,
+                        salary:this.worker.salary,
+                        parent_id:this.parentworker.id
+
+
+                    })
+                    .then(response=>{
+                        this.worker.name=''
+                        this.worker.post=''
+                        this.worker.device_date=''
+                        this.worker.salary=''
+                        this.worker.parent_id=''
+                        this.errors={}
+                        this.$router.push({name:'Workers'})
+                    })
+                    .catch(err=>{ err.response.data.errors
+
+                        if(this.errors.name)
+                        {
+                            this.errors.name='Ведите ФИО'
+                        }
+
+                        if (this.errors.post)
+                        {
+                            this.errors.post='Введите должность сотрудника'
+                        }
+
+                        if(this.errors.salary)
+                        {
+                            this.errors.salary='Введите зарплату сотрудника (дробную часть через точку)'
+                        }
+                        if(this.errors.device_date)
+                        {
+                            this.errors.device_date='Выберите дату устройства'
+
+                        }
+
+                        console.log(this.errors)
+                    })})
+                .catch(err=>{this.errors=err.response.data.errors})
+
+
+
+
+            }
 
         },
         onFieldChange(event){
@@ -348,16 +429,14 @@ export default {
                 this.formData.file=file
                 let reader =new FileReader()
                 reader.onload=e=>{
-                    this.formData.uploadFileData=e.target.result
+                    this.worker.urlImage=e.target.result
                 }
                 reader.readAsDataURL(file)
             }
 
 
         },
-        uploadImage(){
 
-        }
 
 
     }

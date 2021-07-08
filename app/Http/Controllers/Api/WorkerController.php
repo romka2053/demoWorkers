@@ -95,11 +95,14 @@ class WorkerController extends Controller
         ]);
         if($request->fupload)
         {
+            $request->validate([
+                'fupload' => 'required|image',
+            ]);
             $file=$request->fupload;
 
 
             $filename=$file->getClientOriginalName();
-            $filename=time().random_int(1,10000).$filename;
+            $filename=time().random_int(1,10000).random_int(1,100000).$filename;
             //$mime=$file->getClientMimeType();
             // $size=$file->getSize();
 
@@ -143,12 +146,20 @@ class WorkerController extends Controller
 
     public function update(Request $request, $id)
     {
-        $editWorker=worker::find($id);
-        $editWorker->name=$request->get('name');
-        $editWorker->post=$request->get('post');
-        $editWorker->device_date=$request->get('device_date');
-        $editWorker->salary=$request->get('salary');
-        $editWorker->parent_id=$request->get('parent_id');
+        $request->validate([
+            'name' => ['required', 'string', 'max:100'],
+            'post' => ['required', 'string', 'max:40'],
+            'device_date' => ['required'],
+            'salary' => ['required','numeric'],
+            'parent_id' => ['integer'],
+
+        ]);
+        $editWorker=Worker::find($id);
+        $editWorker->name=$request->input('name');
+        $editWorker->post=$request->input('post');
+        $editWorker->device_date=$request->input('device_date');
+        $editWorker->salary=$request->input('salary');
+        $editWorker->parent_id=$request->input('parent_id');
         $editWorker->save();
     }
 
@@ -178,21 +189,32 @@ class WorkerController extends Controller
 
         if($request->fupload)
         {
+            $request->validate([
+                'fupload' => 'required|image',
+            ]);
             $file=$request->fupload;
             $id=$request->id;
 
             $ext=$file->getClientOriginalExtension();
             $filename=$file->getClientOriginalName();
-            $rand='$rand'.'$rand';
-            $filename=time().random_int(1,10000).$filename;
+
+            $filename=time().random_int(1,10000).random_int(1,100000).$filename;
             //$mime=$file->getClientMimeType();
            // $size=$file->getSize();
 
             try{
-                $file->move('images',$filename);
+
                 $editWorker=worker::find($id);
+                if($editWorker->urlImage!=null)
+                {
+                    if(file_exists(public_path().'/images/'.$editWorker->urlImage)) {
+                        unlink(public_path() . '/images/' . $editWorker->urlImage);
+                    }
+                }
+                $file->move('images',$filename);
                 $editWorker->urlImage=$filename;
                 $editWorker->save();
+
             }catch(Exception $e){
                 $result['success']=false;
                 $result['error']=$e->getMessage();

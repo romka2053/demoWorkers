@@ -152,6 +152,7 @@ export default {
             ],
             workers:[],
             workersTree:[],
+            getUrlImage:null,
 
         }
     },
@@ -310,6 +311,21 @@ export default {
             this.dialogdelete=false
             this.dialogTree=true
             this.parentworker={}
+
+        },
+        editItem(item){
+
+            if(item.urlImage)
+            {
+               this.getUrlImage='/images/'+item.urlImage
+            }else
+            {
+                this.getUrlImage=null
+            }
+            this.$router.push({name:'Edit',params:{id:item.id,name:item.name,post:item.post,device_date:item.device_date,
+                salary:item.salary,parent_id:item.parent_id,urlImage:this.getUrlImage
+                }})
+
 
         }
 
