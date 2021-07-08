@@ -30,6 +30,10 @@
 
 
                 >
+                    <template v-slot:item.avatar="{ item }" >
+                        <img v-if="item.urlImage" :src="'/images/'+item.urlImage"style="width: 100px;float:left;padding:10px;" />
+                        <img v-else src="/images/not_avatar.jpg"style="width: 100px;float:left;padding:10px;" />
+                    </template>
                     <template v-slot:item.actions="{ item }">
                         <v-icon
                             small
@@ -138,6 +142,7 @@ export default {
             searched:'',
             headers: [
                 {text: 'ID', value: 'id', },
+                {text: 'Аватарка', value: 'avatar', sortable: false,},
                 { text: 'ФИО', value: 'name' },
                 { text: 'Должность', value: 'post' },
                 { text: 'Дата устройства', value: 'device_date' },
@@ -198,6 +203,8 @@ export default {
                 .then(response => {
 
                     this.workers=response.data.data;
+
+
                     this.totalWorker=response.data.total
 
 
