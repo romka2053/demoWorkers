@@ -5,7 +5,7 @@ use App\Models\Worker;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use mysql_xdevapi\Exception;
-
+use App\Http\Requests\WorkerRequest;
 class WorkerController extends Controller
 {
     public function index(Request $request)
@@ -82,21 +82,14 @@ class WorkerController extends Controller
         return $chief;
     }
 
-    public function store(Request $request)
+    public function store(WorkerRequest $request)
     {
 
-        $request->validate([
-            'name' => ['required', 'string', 'max:100'],
-            'post' => ['required', 'string', 'max:40'],
-            'device_date' => ['required'],
-            'salary' => ['required','numeric'],
-            'parent_id' => ['integer'],
 
-        ]);
         if($request->fupload)
         {
             $request->validate([
-                'fupload' => 'required|image',
+
             ]);
             $file=$request->fupload;
 
@@ -144,16 +137,9 @@ class WorkerController extends Controller
     }
 
 
-    public function update(Request $request, $id)
+    public function update(WorkerRequest $request, $id)
     {
-        $request->validate([
-            'name' => ['required', 'string', 'max:100'],
-            'post' => ['required', 'string', 'max:40'],
-            'device_date' => ['required'],
-            'salary' => ['required','numeric'],
-            'parent_id' => ['integer'],
 
-        ]);
         $editWorker=Worker::find($id);
         $editWorker->name=$request->input('name');
         $editWorker->post=$request->input('post');
@@ -190,7 +176,10 @@ class WorkerController extends Controller
         if($request->fupload)
         {
             $request->validate([
-                'fupload' => 'required|image',
+                'fupload' => 'image',
+            ],
+            [
+                'fupload.image'=>'Загружаемый файл должен быть в формате JPG'
             ]);
             $file=$request->fupload;
             $id=$request->id;

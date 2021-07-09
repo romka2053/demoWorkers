@@ -28,7 +28,7 @@
                             <v-card-text >
                                 <v-form >
                                     <v-file-input
-
+                                        v-model="filename"
                                         @change="onFieldChange"
                                         accept="image/png, image/jpeg, image/bmp"
                                         placeholder="Pick an avatar"
@@ -175,14 +175,15 @@ export default {
             token:localStorage.getItem('token'),
             dialogTree: false,
             selected:[],
+            filename:null,
             worker:{
-                id:this.$route.params.id,
-                name:this.$route.params.name,
-                post:this.$route.params.post,
-                device_date:this.$route.params.device_date,
-                salary:this.$route.params.salary,
-                parent_id:this.$route.params.parent_id,
-                urlImage:this.$route.params.urlImage
+                id:'',
+                name:'',
+                post:'',
+                device_date:'',
+                salary:'',
+                parent_id:'',
+                urlImage:''
             },
             workers: [],
             menu: false,
@@ -200,9 +201,20 @@ export default {
 
     },
     created() {
+            if(this.$route.params.id)
+            {
+                this.worker.id = this.$route.params.id
+                this.worker.name = this.$route.params.name
+                this.worker.post = this.$route.params.post
+                this.worker.device_date = this.$route.params.device_date
+                this.worker.salary = this.$route.params.salary
+                this.worker.urlImage = this.$route.params.urlImage
+                this.worker.parent_id = this.$route.params.parent_id
 
+            }
 
         axios.defaults.headers.common['Authorization']=`Bearer ${this.token}`;
+
 
     },
     watch: {
@@ -212,14 +224,18 @@ export default {
         },
         $route(to,from)
         {
+            this.filename=null,
+            this.errors={},
+            this.worker={
+                id:'',
+                name:'',
+                post:'',
+                device_date:'',
+                salary:'',
+                parent_id:'',
+                urlImage:''
+            }
 
-            this.worker.id = this.$route.params.id
-            this.worker.name = this.$route.params.name
-            this.worker.post = this.$route.params.post
-            this.worker.device_date = this.$route.params.device_date
-            this.worker.salary = this.$route.params.salary
-            this.worker.urlImage = this.$route.params.urlImage
-            this.worker.parent_id = this.$route.params.parent_id
         }
     },
     methods:{
@@ -313,7 +329,7 @@ export default {
             data.append('post',this.worker.post)
             data.append('device_date',this.worker.device_date)
             data.append('salary',this.worker.salary)
-
+            console.log(this.worker)
             if(this.parentworker.id) {
                 data.append('parent_id',this.parentworker.id)
             }
@@ -331,31 +347,7 @@ export default {
                     this.$router.push({name:'Workers'})
                 })
             .catch(err=>{   this.errors=err.response.data.errors
-
-                if(this.errors.name)
-                {
-                    this.errors.name='Ведите ФИО'
-                }
-
-                if (this.errors.post)
-                {
-                    this.errors.post='Введите должность сотрудника'
-                }
-
-                if(this.errors.salary)
-                {
-                    this.errors.salary='Введите зарплату сотрудника (дробную часть через точку)'
-                }
-                    if(this.errors.device_date)
-                    {
-                        this.errors.device_date='Выберите дату устройства'
-
-                    }
-                if(this.errors.fupload)
-                {
-                    this.errors.fupload='Допускается загрузка только в формате изображения'
-
-                }
+                console.log(err.response.data)
             })
 
             }
@@ -390,28 +382,6 @@ export default {
                         this.$router.push({name:'Workers'})
                     })
                     .catch(err=>{ this.errors=err.response.data.errors
-
-                        if(this.errors.name)
-                        {
-                            this.errors.name='Ведите ФИО'
-                        }
-
-                        if (this.errors.post)
-                        {
-                            this.errors.post='Введите должность сотрудника'
-                        }
-
-                        if(this.errors.salary)
-                        {
-                            this.errors.salary='Введите зарплату сотрудника (дробную часть через точку)'
-                        }
-                        if(this.errors.device_date)
-                        {
-                            this.errors.device_date='Выберите дату устройства'
-
-                        }
-
-
                     })})
                 .catch(err=>{this.errors=err.response.data.errors})
 
