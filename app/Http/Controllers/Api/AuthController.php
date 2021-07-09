@@ -12,21 +12,35 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:100'],
+            'name' => ['required', 'string', 'max:100','min:3'],
             'email' => ['required', 'email', 'unique:users'],
             'password' => ['required', 'min:8', 'confirmed'],
-            'password_confirmation' =>['required']
+            'password_confirmation' =>['required'],  ],
+            [
+                'name.required'=>'Поле имя является обязательным',
+                'name.max'=>'Максимальная длина поля 100 символов',
+                'name.min'=>'Минимальная длина поля 3 символа',
+                'email.required'=>'Поле является обязательным для ввода',
+                'email.email'=>'Поле должно содержать @mail',
+                'email.unique'=>'Данный @mail уже зарегистрирован',
+                'password.required'=>'Поле является обязательным для ввода',
+                'password.min'=>'Пароль должен быть не менее 8 символов',
+                'password.confirmed'=>'Введенные пароли не совпадают',
+                'password_confirmation.required'=>'Поле является обязательным для ввода'
+
+            ]
 
 
 
-        ]);
+      );
         User::create([
             'name'=>$request->name,
             'email'=>$request->email,
             'password'=>Hash::make($request->password)
+        ]
 
 
-        ]);
+        );
         return response()->json(['msg'=>'request successssss']);
     }
 
@@ -37,7 +51,16 @@ class AuthController extends Controller
             'email' => 'required|email',
             'password' => 'required',
             'device_name' => 'required',
-        ]);
+        ],
+        [
+
+                'email.required'=>'Поле является обязательным',
+                'password.required'=>'Поле является обязательным для ввода',
+
+
+        ]
+
+        );
 
         $user = User::where('email', $request->email)->first();
 

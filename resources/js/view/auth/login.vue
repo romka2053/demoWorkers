@@ -98,11 +98,13 @@ export default {
                     this.$refs.form.reset()
                     this.$refs.form.resetValidation();
                     this.$router.push({name:'IndexAdmin'})
+                    this.errors={}
                 })
                 .catch(err => {
                     this.snackbar=true;
                     this.isLoading=false
                     this.$refs.form.reset()
+                    this.errors=err.response.data.errors
                 })
                 .finally(()=>{this.isLoading=false})
 
