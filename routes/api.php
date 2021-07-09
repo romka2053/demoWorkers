@@ -22,8 +22,6 @@ Route::get("tree/", [WorkerController::class,'tree']);
 
 
 
-
-
 Route::group(['middleware'=>['auth:sanctum']],function (){
 
     Route::post('upload_file/',[WorkerController::class,'image']);
@@ -35,6 +33,8 @@ Route::group(['middleware'=>['auth:sanctum']],function (){
     Route::put("workers/{id}", [WorkerController::class,'update']);
     Route::get("workers/{id}", [WorkerController::class,'show']);
     Route::delete("workers/{id}", [WorkerController::class,'destroy']);
+
+
 
     Route::get('/user', function (Request $request) {
         return $request->user();

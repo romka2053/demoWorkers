@@ -258,7 +258,7 @@ export default {
             return  axios
                 .get('/api/tree/',{params:{id:item.id}})
                 .then(response=> {
-                        let tmpItem=response.data.map(childItem=>{
+                        let tmpItem=response.data.data.map(childItem=>{
                             if(childItem.children!='')
                             {
                                 childItem.children=[]
@@ -291,8 +291,8 @@ export default {
             axios
                 .get('/api/treedel/',{params:{delete_id:this.worker.id}})
                 .then(response =>{
-                    this.workers=response.data
-                    for(var i=0;i<response.data.length;i++)
+                    this.workers=response.data.data
+                    for(var i=0;i<response.data.data.length;i++)
                     {
                         if(this.workers[i].children!='')
                         {

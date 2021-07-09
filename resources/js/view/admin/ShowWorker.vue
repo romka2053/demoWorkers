@@ -97,27 +97,25 @@ data(){
                     .then(response => {
 
                         this.loading = true
-                        if (!response.data.urlImage) {
+                        if (!response.data.data.urlImage) {
 
                             this.form.imageUrl = "not_avatar.jpg"
                         } else {
 
-                            this.form.imageUrl = response.data.urlImage
+                            this.form.imageUrl = response.data.data.urlImage
                         }
 
 
-                        if (!response.data) {
-                            this.errored = true;
-                            this.worker = {}
-                            this.loading = true
-                        } else {
-                            this.worker = response.data
+
+                            this.worker = response.data.data
 
                             this.errored = false;
                             this.loading = false
-                        }
                     })
-                    .catch(err => this.loading = true)
+                    .catch(err =>{
+                        this.worker = {}
+                        this.errored = true;
+                        this.loading = true})
 
             }else
             {this.errored = false;

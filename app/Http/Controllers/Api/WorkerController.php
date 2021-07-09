@@ -6,8 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use mysql_xdevapi\Exception;
 use App\Http\Requests\WorkerRequest;
+use App\Http\Resources\WorkerResource;
+use App\Http\Resources\TreeResource;
 class WorkerController extends Controller
 {
+
+
     public function index(Request $request)
     {
         $search=$request->input('s');
@@ -42,13 +46,15 @@ class WorkerController extends Controller
 
                 }
             }
-            return $workers;
 
 
+
+            return   WorkerResource::collection($workers);
 
         }
         else {
-            return worker::paginate($pagecount);
+            return   WorkerResource::collection(Worker::paginate($pagecount));
+
         }
 
 
@@ -69,7 +75,7 @@ class WorkerController extends Controller
         $chief = Worker::where([['parent_id',$parent_id],['id','<>',$delete_id]])
             ->with('children')
             ->get();
-        return $chief;
+        return TreeResource::collection($chief);
     }
 
     public function tree(Request $request)
@@ -79,7 +85,7 @@ class WorkerController extends Controller
         $chief = Worker::where('parent_id',$parent_id)
             ->with('children')
             ->get();
-        return $chief;
+        return TreeResource::collection($chief);
     }
 
     public function store(WorkerRequest $request)
@@ -131,9 +137,11 @@ class WorkerController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show(Request $request)
-    {$id=$request->id;
-        $editWorker=worker::find($id);
-        return $editWorker;
+    {
+
+        $id=$request->id;
+
+        return new WorkerResource(Worker::findOrFail($id));
     }
 
 
@@ -159,6 +167,8 @@ class WorkerController extends Controller
     {
         worker::find($id)->delete();
     }
+
+
     public function Parent(Request $request){
         $deleteid=$request->deleteid;
         $parentid=$request->parentid;

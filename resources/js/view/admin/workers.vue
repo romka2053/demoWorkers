@@ -232,8 +232,9 @@ export default {
             axios
                 .get('/api/treedel/',{params:{delete_id:this.deleteworker.id}})
                 .then(response =>{
-                    this.workersTree=response.data
-                    for(var i=0;i<response.data.length;i++)
+
+                    this.workersTree=response.data.data
+                    for(var i=0;i<this.workersTree.length;i++)
                     {
                         if(this.workersTree[i].children!='')
                         {
@@ -260,7 +261,7 @@ export default {
             return  axios
                 .get('/api/treedel/',{params:{id:item.id,delete_id: this.deleteworker.id}})
                 .then(response=> {
-                        let tmpItem=response.data.map(childItem=>{
+                        let tmpItem=response.data.data.map(childItem=>{
 
                             if(childItem.children!='')
                             {

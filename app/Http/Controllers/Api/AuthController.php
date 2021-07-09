@@ -41,7 +41,7 @@ class AuthController extends Controller
 
 
         );
-        return response()->json(['msg'=>'request successssss']);
+
     }
 
 
@@ -55,6 +55,7 @@ class AuthController extends Controller
         [
 
                 'email.required'=>'Поле является обязательным',
+                'email.email'=>'Поле должно содержать @mail',
                 'password.required'=>'Поле является обязательным для ввода',
 
 
